@@ -1,0 +1,214 @@
+#
+#	Test suite for the PDP-11/70 Virtual machine
+#
+#	main program:
+#
+004767	start:	jsr	pc, test1
+000036
+106300		dump
+004767		jsr	pc, test2
+000074
+106300		dump
+004767		jsr	pc, test3
+000142
+106300		dump
+004767		jsr	pc, test4
+000236
+106300		dump
+004767		jsr	pc, test5
+000410
+106300		dump
+000167		jmp	stop
+000520
+#
+#       first sub-program:
+#
+012767	test1:	mov	#25, a
+000025
+000514
+012767		mov	#25, b
+000025
+000510
+012700		mov	#a, r0
+000564
+012701		mov	#b, r1
+000566
+012702		mov	#3, r2
+000003
+006310	shift1:	asl	(r0)
+077202		sob	r2, shift1
+006311		asl	(r1)
+061110		add	(r1), (r0)
+011003		mov	(r0), r3
+000207	        rts	pc
+#
+#	second sub-program:
+#
+012710	test2:	mov	#14, (r0)
+000014
+012711		mov	#23, (r1)
+000023
+161110		sub	(r1), (r0)
+012710		mov	#14, (r0)
+000014
+161011		sub	(r0), (r1)
+012711		mov	#23, (r1)
+000023
+012700		mov	#14, r0
+000014
+012704		mov	#23, r4
+000023
+070004		mul	r4, r0
+005002		clr	r2
+016703		mov	b, r3
+000414
+016705		mov	a, r5
+000406
+071205		div	r5, r2
+000207		rts	pc
+#
+#	third sub-program:
+#
+005002	test3:	clr	r2
+012701		mov	#d, r1
+000572
+012711		mov	#173256, (r1)
+173256
+000241		clc
+005003		clr	r3
+022703	getnum:	cmp	#20, r3
+000020
+001416		beq	gotnum
+005203		inc	r3
+006311		asl	(r1)
+103401		bcs	iseven
+000771		br	getnum
+022702	iseven:	cmp	#0, r2
+000000
+001401		beq	move1
+000403		br	move0
+012702	move1:	mov	#1, r2
+000001
+000762		br	getnum
+012702	move0:	mov	#0, r2
+000000
+000757		br	getnum
+022702	gotnum:	cmp	#0, r2
+000000
+001403		beq	even
+012705		mov	#1, r5
+000001
+000207		rts	pc
+012705	even:	mov	#2, r5
+000002
+000207		rts	pc
+#
+#	fourth sub-program:
+#
+012700	test4:	mov	#x, r0
+000574
+012720		mov	#000327, (r0)+
+000327
+012710		mov	#161600, (r0)
+161600
+011005		mov	(r0), r5
+014001		mov	-(r0), r1
+012702		mov	#4, r2
+000004
+022702	getime:	cmp	#0, r2
+000000
+001403		beq	shift
+005302		dec	r2
+006201		asr	r1
+000772		br	getime
+010167	shift:	mov	r1, d
+000242
+011001		mov	(r0), r1
+005002		clr	r2
+022702	nonum:	cmp	#14, r2
+000014
+001403		beq	nonum2
+005202		inc	r2
+006301		asl	r1
+000772		br	nonum
+005002	nonum2:	clr	r2
+012703		mov	#y, r3
+000600
+022702	contin:	cmp	#4, r2
+000004
+001410		beq	gotime
+005202		inc	r2
+006301		asl	r1
+103402		bcs	putone
+105023		clrb	(r3)+
+000770		br	contin
+112723	putone:	movb	#1, (r3)+
+000001
+000765		br	contin
+005002	gotime:	clr	r2
+016701		mov	d, r1
+000160
+162701		sub	#4, r1
+000004
+020102	unpak:	cmp	r1, r2
+001410		beq	done
+005202		inc	r2
+006305		asl	r5
+103402		bcs	mov1
+105023		clrb	(r3)+
+000771		br	unpak
+112723	mov1:	movb	#1, (r3)+
+000001
+000766		br	unpak
+000207	done:	rts	pc
+#
+#	fifth sub-program:
+#
+012700	test5:	mov	#4, r0
+000004
+000261		sec
+005500		adc	r0
+072027		ash	#3, r0
+000003
+105300		decb	r0
+012701		mov	#20, r1
+000020
+022701	shit:	cmp	#0, r1
+000000
+001003		bne	up
+005301		dec	r1
+006100		rol	r0
+000403		br	down
+006000	up:	ror	r0
+005301		dec	r1
+000767		br	shit
+006000	down:	ror	r0
+000300		swab	r0
+006700		sxt	r0
+005700		tst	r0
+012700		mov	#1, r0
+000001
+012701		mov	#a, r1
+000564
+074167		xor	r1, a
+000030
+005001		clr	r1
+005067		clr	a
+000022
+112761		movb	#3, a(r1)
+000003
+000564
+005201		inc	r1
+112761		movb	#2, a(r1)
+000002
+000564
+000207		rts	pc
+000000		halt
+000000		a:	.word	0
+000000		b:	.word	0
+000000		c:	.word	0
+000000		d:	.word	0
+000000		x:	.word	0
+000000		y:	.word	0
+000000		z:	.word	0
+
